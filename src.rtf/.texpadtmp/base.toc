@@ -1,0 +1,91 @@
+\contentsline {chapter}{Acknowledgements}{i}{chapter*.1}
+\contentsline {chapter}{Abstract}{iii}{chapter*.2}
+\contentsline {chapter}{Contents}{v}{section*.3}
+\contentsline {chapter}{List of Figures}{ix}{section*.4}
+\contentsline {chapter}{List of Tables}{xi}{section*.5}
+\contentsline {chapter}{Publications}{xiii}{chapter*.6}
+\contentsline {part}{\partnumberline {I}Introduction \textsw {\& }Background}{1}{part.1}
+\contentsline {chapter}{\chapternumberline {1}Introduction}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}Motivation}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}Research Narrative}{4}{section.1.2}
+\contentsline {section}{\numberline {1.3}Hypotheses}{5}{section.1.3}
+\contentsline {section}{\numberline {1.4}Approach}{5}{section.1.4}
+\contentsline {section}{\numberline {1.5}Organization}{6}{section.1.5}
+\contentsline {chapter}{\chapternumberline {2}Background}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Photochemistry on Semiconductor Surfaces}{7}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Photolysis and the Solar Spectrum}{8}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Photolysis Systems}{11}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Length Scales in Photochemistry}{13}{subsection.2.1.3}
+\contentsline {subsection}{\numberline {2.1.4}Surface Activity Considerations}{16}{subsection.2.1.4}
+\contentsline {section}{\numberline {2.2}Charged Interfaces and Surfaces}{17}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}p-n Junction}{18}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Ferroelectric Polarization}{20}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}Polar Terminations}{24}{subsection.2.2.3}
+\contentsline {section}{\numberline {2.3}Epitaxy}{26}{section.2.3}
+\contentsline {section}{\numberline {2.4}Crystallography}{28}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Hematite}{29}{subsection.2.4.1}
+\contentsline {subsection}{\numberline {2.4.2}Perovskites}{30}{subsection.2.4.2}
+\contentsline {subsubsection}{Strontium Titanate}{30}{subsection.2.4.2}
+\contentsline {subsubsection}{Bismuth Ferrite}{31}{figure.caption.23}
+\contentsline {chapter}{\chapternumberline {3}Experimental Overview}{35}{chapter.3}
+\contentsline {section}{\numberline {3.1}Fabrication Methods}{35}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Solid State Synthesis}{35}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Pulsed Laser Deposition}{38}{subsection.3.1.2}
+\contentsline {section}{\numberline {3.2}Characterization Methods}{42}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Marker Reactions}{42}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}\textsc {\MakeLowercase {EBSD}}}{45}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}X-ray}{49}{subsection.3.2.3}
+\contentsline {subsection}{\numberline {3.2.4}Scanning Probe Microscopy}{50}{subsection.3.2.4}
+\contentsline {part}{\partnumberline {II}Experiments on Photochemical Activity}{53}{part.2}
+\contentsline {chapter}{\chapternumberline {4}Orientation Dependent Hematite Reactivity}{55}{chapter.4}
+\contentsline {section}{\numberline {4.1}Experimental Details}{55}{section.4.1}
+\contentsline {section}{\numberline {4.2}Results}{57}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Scanning Electron Microscopy}{57}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Atomic Force Microscopy}{58}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Kelvin Probe Force Microscopy}{62}{subsection.4.2.3}
+\contentsline {section}{\numberline {4.3}Discussion}{65}{section.4.3}
+\contentsline {section}{\numberline {4.4}Conclusions and Context}{70}{section.4.4}
+\contentsline {chapter}{\chapternumberline {5}Hematite Reactivity on Single Crystal Substrates}{71}{chapter.5}
+\contentsline {section}{\numberline {5.1}Experimental Details}{71}{section.5.1}
+\contentsline {section}{\numberline {5.2}Results}{71}{section.5.2}
+\contentsline {section}{\numberline {5.3}Discussion}{74}{section.5.3}
+\contentsline {section}{\numberline {5.4}Conclusions}{77}{section.5.4}
+\contentsline {chapter}{\chapternumberline {6}Hematite Film Reactivity on Polycrystalline Substrates}{79}{chapter.6}
+\contentsline {section}{\numberline {6.1}Experimental Details}{79}{section.6.1}
+\contentsline {section}{\numberline {6.2}Results}{80}{section.6.2}
+\contentsline {subsection}{\numberline {6.2.1}Optical Microscopy}{80}{subsection.6.2.1}
+\contentsline {subsection}{\numberline {6.2.2}Atomic Force Microscopy}{85}{subsection.6.2.2}
+\contentsline {section}{\numberline {6.3}Discussion}{86}{section.6.3}
+\contentsline {section}{\numberline {6.4}Conclusions}{89}{section.6.4}
+\contentsline {part}{\partnumberline {III}Experiments on Film Growth}{91}{part.3}
+\contentsline {chapter}{\chapternumberline {7}Hematite Film Growth on Single Crystal Substrates}{93}{chapter.7}
+\contentsline {section}{\numberline {7.1}Film Growth on Strontium Titanate (111) Substrates}{93}{section.7.1}
+\contentsline {section}{\numberline {7.2}Film Growth on Strontium Titanate (001) Substrates}{98}{section.7.2}
+\contentsline {subsection}{\numberline {7.2.1}\textsc {\MakeLowercase {EBSD}} Mapping}{98}{subsection.7.2.1}
+\contentsline {subsection}{\numberline {7.2.2}Pole Figure Analysis}{102}{subsection.7.2.2}
+\contentsline {subsubsection}{Red Partition}{104}{subsection.7.2.2}
+\contentsline {subsubsection}{Cyan Partition}{104}{figure.caption.64}
+\contentsline {subsubsection}{Purple and White Partitions}{107}{figure.caption.65}
+\contentsline {subsubsection}{Yellow Partition}{110}{figure.caption.68}
+\contentsline {subsection}{\numberline {7.2.3}Discussion}{112}{subsection.7.2.3}
+\contentsline {section}{\numberline {7.3}Conclusions}{114}{section.7.3}
+\contentsline {chapter}{\chapternumberline {8}Hematite Film Growth on Polycrystalline Substrates}{115}{chapter.8}
+\contentsline {section}{\numberline {8.1}Film Growth and Orientation Data Collection}{115}{section.8.1}
+\contentsline {section}{\numberline {8.2}Orientation Relationship Analysis}{118}{section.8.2}
+\contentsline {section}{\numberline {8.3}Discussion}{123}{section.8.3}
+\contentsline {section}{\numberline {8.4}Conclusion}{126}{section.8.4}
+\contentsline {part}{\partnumberline {IV}Experiments on Bismuth Ferrite}{127}{part.4}
+\contentsline {chapter}{\chapternumberline {9}Photochemical Reactivity of Bismuth Ferrite Ceramics}{129}{chapter.9}
+\contentsline {section}{\numberline {9.1}Background}{129}{section.9.1}
+\contentsline {section}{\numberline {9.2}Experimental Details}{131}{section.9.2}
+\contentsline {section}{\numberline {9.3}Results}{132}{section.9.3}
+\contentsline {section}{\numberline {9.4}Discussion}{137}{section.9.4}
+\contentsline {section}{\numberline {9.5}Conclusion}{143}{section.9.5}
+\contentsline {part}{\partnumberline {V}Summary, Conclusions, \textsw {\& }Future Paths}{145}{part.5}
+\contentsline {chapter}{\chapternumberline {10}Conclusions \textsw {\& }Future Work}{147}{chapter.10}
+\contentsline {section}{\numberline {10.1}Summary of Photochemical Activity Results}{147}{section.10.1}
+\contentsline {section}{\numberline {10.2}Summary of Film Growth Results}{148}{section.10.2}
+\contentsline {section}{\numberline {10.3}Summary of Bismuth Ferrite Results}{149}{section.10.3}
+\contentsline {section}{\numberline {10.4}Future Paths}{149}{section.10.4}
+\contentsline {chapter}{References}{151}{section*.87}
+\contentsline {chapter}{Colophon}{151}{section*.88}

@@ -1,0 +1,74 @@
+This is BibTeX, Version 0.99d (TeX Live 2011)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: base.aux
+The style file: cmuthesis.bst.bst
+Database file #1: thesis-cited.bib
+Warning--missing institution in Report:2004wb
+You can't pop an empty literal stack for entry Morrison:1980va
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry memming2001semiconductor
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--empty author and editor in noauthororeditor2007handbook
+You can't pop an empty literal stack for entry noauthororeditor2007handbook
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Kaneko:2002vh
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--missing publisher in Lines:1977ug
+You can't pop an empty literal stack for entry Lines:1977ug
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Herman:2004to
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Chrisey:1994ta
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Kosmulski:2001ww
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Schwartz:2009ue
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry birkholz2006thin
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--can't use both author and editor fields in Domen:1996um
+You can't pop an empty literal stack for entry Domen:1996um
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--empty pages in Domen:1996um
+You've used 118 entries,
+            2581 wiz_defined-function locations,
+            1331 strings with 26135 characters,
+and the built_in function-call counts, 55130 in all, are:
+= -- 4481
+> -- 1379
+< -- 212
++ -- 508
+- -- 390
+* -- 3535
+:= -- 5626
+add.period$ -- 237
+call.type$ -- 118
+change.case$ -- 6
+chr.to.int$ -- 9
+cite$ -- 123
+duplicate$ -- 5070
+empty$ -- 4834
+format.name$ -- 478
+if$ -- 12663
+int.to.chr$ -- 0
+int.to.str$ -- 118
+missing$ -- 1098
+newline$ -- 475
+num.names$ -- 117
+pop$ -- 1290
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 2223
+stack$ -- 0
+substring$ -- 4149
+swap$ -- 4177
+text.length$ -- 209
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 5
+while$ -- 421
+width$ -- 121
+write$ -- 1057
+(There were 11 error messages)

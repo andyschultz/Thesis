@@ -1,0 +1,1024 @@
+% !TEX root = base.tex 
+
+\chapter{Source Code}
+
+\section{ORs}
+
+The Fortran code below, developed by G.S. Rohrer, was used to calculate orientation relationships between substrate and film orientations using collected EBSD data for films on both single crystal and polycrystalline substrates.
+
+\subsection{main.f}
+
+    \lstset{language=Fortran,
+    		stepnumber=2,
+    		breaklines=true}
+
+\ttfamily
+\begin{lstlisting}
+
+C*****************************************
+       program orientation relationships
+C*****************************************
+       implicit none
+	   include 'common.fi'
+
+       write(6,*) '=============================================='
+	   write(6,*) ' PROGRAM TO DETERMINE ORIENTATION RELATIONSHIPS'
+	   write(6,*) ' BETWEEN A SUBSTRATE AND FILM BASED ON EBSD'
+	   write(6,*) ' DATA.  CALCAULATES THE MINIMUM ANGLE BETWEEN'	   
+	   write(6,*) ' A REFERENCE DIRECTION IN THE SUBSTRATE AND '	  
+	   write(6,*) ' A REFERENCE DIRECTION IN THE FILM'	  
+	   write(6,*)
+	   write(6,*) '  rohrer@cmu.edu'
+	   write(6,*) '  version 11/14/2011'
+       write(6,*) '=============================================='
+	   
+	   version = 'version 11/14/2011'
+       pi = 4.0*atan(1.0)
+
+       open(21, file='input.txt', status='old')
+	   read(21,*) keyword
+c	   read(21,*) phase_in       
+	   read(21,*) nref1(1), nref1(2), nref1(3)
+	   read(21,*) nref2(1), nref2(2), nref2(3)	 
+	   read(21,*) sym1	
+	   read(21,*) sym2		   
+	   close(21)  
+	   point = index(keyword,'.') - 1	
+
+c  This part is to determines the total number of pairs of Euler angles in the data file
+
+		nnline = 0
+        open (32, file=keyword(1:point)//'.txt', status='old')
+ 10     continue
+		read(32,*,end=11)
+		nnline=nnline+1
+		goto 10
+ 11     continue
+        close(32)
+ 12    	format(A,I7,A)
+		write(6,12) 'There are',nnline,' lines in the data file.'
+
+		open(41, file=keyword(1:point)//'.txt', status='old') !pick out file name based on phase
+c		if(phase_in.eq.'Anatase') then
+	     open(33, file=keyword(1:point)//'_results.txt', status='unknown')
+c		else
+c        open(33, file=keyword(1:point)//'_results_rutile.txt', status='unknown')
+c		endif 
+        write(33,20)'file written by ors: ',version ! write informative headers
+		write(33,20)'analyzing file: ',keyword
+        write(33,22)'Minimum angle between substrate direction: [',nref2(1),', ',nref2(2),', ',nref2(3),']'
+        write(33,22)'and film direction: [',nref1(1),', ',nref1(2),', ',nref1(3),'] in degrees'
+c		write(33,20)'for :',phase_in
+        write(6,20)'written by ors: ',version
+		write(6,20)'analyzing file: ',keyword
+        write(6,22)'Minimum angle between substrate direction: [',nref2(1),', ',nref2(2),', ',nref2(3),']'
+        write(6,22)'and film direction: [',nref1(1),', ',nref1(2),', ',nref1(3),'] in degrees'
+c		write(6,20)'for :',phase_in 
+
+ 20     format(A,A)	
+ 22     format(A,f5.3,A,f5.3,A,f5.3,A,A) 
+ 		
+c Now we read the data.  The assumptions about the data are that there are that
+c the Euler angles are in radians, and that the first three are from the cubic
+c substrate and that the second three are from the tetragonal film. 
+
+        do jj=1,nnline  !Read one line of the data file at a time
+
+		read(41,*) e1(1), e1(2), e1(3), e2(1), e2(2), e2(3), id1,id2
+		
+c		if (phase.ne.phase_in) then  !Only analyze the phase specified by the input file
+c		 goto 8000
+c		endif
+
+c  Here we get the symmetry operators for the tetraganal system, and put them in O1, 
+c  and the symmetry operators for the cubic system and put them in O2
+
+         call get_symop (sym1, O1, nsymm1)	 !film operators 
+	     call get_symop (sym2, O2, nsymm2)	 !substrate operators 
+
+c  This part converts the Euler angles to a g matrix
+
+         call EToG(e1,g2) !substrate orientation
+		 call EToG(e2,g1) !film orientation
+
+c   This part finds all the equivalent orientations for the substrate and film
+c   Note: I also reversed the crystal order, and the result didn't change
+
+         min_angle=pi
+		 min_rot=pi
+         do i=1,nsymm1	
+		  call symop(O1,i,so1)  !returns the i-th 3x3 tetragonal symmetry operator from O  
+		  call MToM (so1,g1,gg1) !hit the film g matrix with the i-th symmetry operator	
+		  call trans(gg1,gg1t)  !takes the transpose
+		  call MToV (gg1t, nref1, n3) !n3 is [001] direction of the tetragonal crystal, in sample ref frame
+
+          do j=1,nsymm2
+		  
+		   call symop(O2,j,so2)  !returns the j-th 3x3 cubic symmetry operator from O	   
+		   call MToM(so2,g2,gg2)  !hits the substrate g matrix with the j-th symmetry operator	
+		   call trans(gg2,gt)  !takes the transpose
+		   call MToV (gt, nref2, n4)  !n4 is substrate reference direction, in the sample reference frame
+           angle=acos((n3(1)*n4(1))+(n3(2)*n4(2))+(n3(3)*n4(3))) ! angle between the film and substrate reference directions
+		   if (angle.lt.min_angle) then
+		    min_angle=angle
+		   endif	
+
+		  enddo ! end j loop
+		 enddo ! end i loop
+		  		  
+		 write(33,*) min_angle*(180./pi)  !Write to text file
+		 write(6,*) min_angle*(180./pi)	  !Write to text terminal		 
+		  
+ 50      format(7f10.2)
+
+c   Now we have to search the list for the minimum misorientation and
+c   minimum misorientation between reference directions.
+
+ 8000    continue		 
+         enddo
+		 close(41)
+         close(33)
+ 9000    continue  
+         end
+
+  \end{lstlisting}
+  
+\subsection{sub.f}
+
+
+
+  \begin{lstlisting}
+      \lstset{language=Fortran,
+    		stepnumber=10,
+    		breaklines=true}
+
+  c=============================================
+	subroutine EToG (euler, g)
+c=============================================
+	include 'common.fi'
+       
+	g(1,1)=cos(euler(1))*cos(euler(3))
+     &	                 -sin(euler(1))*sin(euler(3))*cos(euler(2))
+	g(1,2)=sin(euler(1))*cos(euler(3))
+     &	                 +cos(euler(1))*sin(euler(3))*cos(euler(2))
+	g(1,3)=sin(euler(3))*sin(euler(2))
+	g(2,1)=-cos(euler(1))*sin(euler(3))
+     &	                 -sin(euler(1))*cos(euler(3))*cos(euler(2))
+	g(2,2)=-sin(euler(1))*sin(euler(3))
+     &	                 +cos(euler(1))*cos(euler(3))*cos(euler(2))
+	g(2,3)=cos(euler(3))*sin(euler(2))
+	g(3,1)=sin(euler(1))*sin(euler(2))
+	g(3,2)=-cos(euler(1))*sin(euler(2))
+	g(3,3)=cos(euler(2))
+
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine GToE (delg, euler)
+c=============================================
+	include 'common.fi'
+	
+	xz=delg(3,3)
+	
+	if (xz*xz.lt.1.0) then
+	sf=sqrt(1.0-xz*xz)
+	else
+	sf=0.0
+	endif
+
+	if (sf.gt.eps) then
+	euler(1)=-delg(3,2)/sf
+	euler(1)=acos2(euler(1))
+	if (delg(3,1).lt.0.0) euler(1)=2.0*pi-euler(1)
+	euler(2)=acos2(xz)
+	euler(3)=delg(2,3)/sf
+	euler(3)=acos2(euler(3))
+	if (delg(1,3).lt.0.0) euler(3)=2.0*pi-euler(3)
+	else
+	euler(1)=delg(2,2)
+	euler(1)=acos2(euler(1))
+	if (delg(1,2).lt.0.0) euler(1)=2.0*pi-euler(1)
+	euler(2)=0.0
+	euler(3)=0.0
+	endif
+
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine MtoM (g1, g2, g3)
+c=============================================
+	include 'common.fi'
+
+	do ii=1,3
+	do jj=1,3
+	g3(ii,jj)=0.0
+	do kk=1,3
+	g3(ii,jj)=g3(ii,jj)+g1(ii,kk)*g2(kk,jj)
+	enddo
+	enddo
+	enddo
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine MToV (g, n1, n2)
+c=============================================
+    include 'common.fi'
+
+	do ii=1,3
+	n2(ii)=0.0
+	do jj=1,3
+	n2(ii)=n2(ii)+g(ii,jj)*n1(jj)
+	enddo
+	enddo
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine AnglesToV (theta, psi, vector_out)
+c=============================================
+	include 'common.fi'
+	
+	vector_out(1)=0.0
+	vector_out(2)=0.0
+	vector_out(3)=0.0
+	
+	vector_out(1)=sin(theta)*cos(psi)
+	vector_out(2)=sin(theta)*sin(psi)
+	vector_out(3)=cos(theta)
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine VToAngles (v, a)
+c=============================================
+	include 'common.fi'
+
+	if (v(3).lt.0.0) then
+	do ii=1,3
+	v(ii)=-v(ii)
+	enddo
+	endif
+
+	a(1)=acos2(v(3))
+c	if (v(1).ne.0.0) then
+c	a(2)=atan(v(2)/v(1))
+c	else
+c	a(2)=pi*0.5
+c	endif
+	a(2)=atan2(v(2),v(1))
+	if (a(2).lt.0.0) a(2)=2.0*pi+a(2)
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine AAToG (x, phi, g)
+c=============================================
+	include 'common.fi'
+	
+	g(1,1)=cos(phi)+(1.0-cos(phi))*(x(1)**2)
+	g(1,2)=x(1)*x(2)*(1.0-cos(phi))-x(3)*sin(phi)
+	g(1,3)=x(1)*x(3)*(1.0-cos(phi))+x(2)*sin(phi)
+	g(2,1)=x(1)*x(2)*(1.0-cos(phi))+x(3)*sin(phi)
+	g(2,2)=cos(phi)+(1.0-cos(phi))*(x(2)**2)
+	g(2,3)=x(3)*x(2)*(1.0-cos(phi))-x(1)*sin(phi)
+	g(3,1)=x(1)*x(3)*(1.0-cos(phi))-x(2)*sin(phi)
+	g(3,2)=x(2)*x(3)*(1.0-cos(phi))+x(1)*sin(phi)
+	g(3,3)=cos(phi)+(1.0-cos(phi))*(x(3)**2)
+
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine trans (g, gt)
+c=============================================
+	include 'common.fi'
+
+	do ii=1,3
+	do jj=1,3
+	gt(ii,jj)=g(jj,ii)
+	enddo
+	enddo
+
+	return
+	end
+
+
+
+
+c=============================================
+	subroutine symop (op, i, so)
+c=============================================
+	include 'common.fi'
+	
+
+	do ii=1,3
+	do jj=1,3
+	so(ii,jj)=op(ii,jj,i)
+	enddo
+	enddo
+
+	return
+	end
+
+
+
+
+c=============================================
+      function acos2(value)
+c=============================================
+	include 'common.fi'
+	
+      temp=value
+	if (temp.gt.1.0) temp=1.0
+	if (temp.lt.-1.0) temp=-1.0
+	acos2=acos(temp)
+	
+	return
+	end
+	  
+  \end{lstlisting}
+
+\subsection{symmetry.f}
+
+  \begin{lstlisting}
+  
+  c=============================================
+      subroutine get_symop(ii, O, ns)
+c=============================================
+       implicit none
+	   include 'common.fi'
+	
+		
+		do i = 1,3
+           do j = 1,3
+              do k = 1,24
+                 O(i,j,k) = 0.0
+              enddo
+           enddo
+        enddo
+
+
+	if (ii.eq.1) then    ! tetragonal (4/mmm)
+	ns=8
+!     1      
+	O(1,1,1)=1.0
+	O(1,2,1)=0.0
+	O(1,3,1)=0.0
+	O(2,1,1)=0.0
+	O(2,2,1)=1.0
+	O(2,3,1)=0.0
+	O(3,1,1)=0.0
+	O(3,2,1)=0.0
+	O(3,3,1)=1.0
+!     2      
+	O(1,1,2)=-1.0
+	O(1,2,2)=0.0
+	O(1,3,2)=0.0
+	O(2,1,2)=0.0
+	O(2,2,2)=1.0
+	O(2,3,2)=0.0
+	O(3,1,2)=0.0
+	O(3,2,2)=0.0
+	O(3,3,2)=-1.0
+!     3      
+	O(1,1,3)=1.0
+	O(1,2,3)=0.0
+	O(1,3,3)=0.0
+	O(2,1,3)=0.0
+	O(2,2,3)=-1.0
+	O(2,3,3)=0.0
+	O(3,1,3)=0.0
+	O(3,2,3)=0.0
+	O(3,3,3)=-1.0 !  corrected 10 April 2007, ADR
+!     4      
+	O(1,1,4)=-1.0
+	O(1,2,4)=0.0
+	O(1,3,4)=0.0
+	O(2,1,4)=0.0
+	O(2,2,4)=-1.0
+	O(2,3,4)=0.0
+	O(3,1,4)=0.0
+	O(3,2,4)=0.0
+	O(3,3,4)=1.0
+!     5      
+	O(1,1,5)=0.0
+	O(1,2,5)=1.0
+	O(1,3,5)=0.0
+	O(2,1,5)=-1.0
+	O(2,2,5)=0.0
+	O(2,3,5)=0.0
+	O(3,1,5)=0.0
+	O(3,2,5)=0.0
+	O(3,3,5)=1.0
+!     6      
+	O(1,1,6)=0.0
+	O(1,2,6)=-1.0
+	O(1,3,6)=0.0
+	O(2,1,6)=1.0
+	O(2,2,6)=0.0
+	O(2,3,6)=0.0
+	O(3,1,6)=0.0
+	O(3,2,6)=0.0
+	O(3,3,6)=1.0
+!     7      
+	O(1,1,7)=0.0
+	O(1,2,7)=1.0
+	O(1,3,7)=0.0
+	O(2,1,7)=1.0
+	O(2,2,7)=0.0
+	O(2,3,7)=0.0
+	O(3,1,7)=0.0
+	O(3,2,7)=0.0
+	O(3,3,7)=-1.0
+!     8      
+	O(1,1,8)=0.0
+	O(1,2,8)=-1.0
+	O(1,3,8)=0.0
+	O(2,1,8)=-1.0
+	O(2,2,8)=0.0
+	O(2,3,8)=0.0
+	O(3,1,8)=0.0
+	O(3,2,8)=0.0
+	O(3,3,8)=-1.0
+
+      elseif (ii.eq.2) then    ! hexagonal (6/mmm)
+      ns=12
+!     1      
+	O(1,1,1)=1.0
+	O(1,2,1)=0.0
+	O(1,3,1)=0.0
+	O(2,1,1)=0.0
+	O(2,2,1)=1.0
+	O(2,3,1)=0.0
+	O(3,1,1)=0.0
+	O(3,2,1)=0.0
+	O(3,3,1)=1.0
+!     2      
+	O(1,1,2)=-0.5
+	O(1,2,2)=sqrt(3.0)*0.5
+	O(1,3,2)=0.0
+	O(2,1,2)=-sqrt(3.0)*0.5
+	O(2,2,2)=-0.5
+	O(2,3,2)=0.0
+	O(3,1,2)=0.0
+	O(3,2,2)=0.0
+	O(3,3,2)=1.0
+!     3      
+	O(1,1,3)=-0.5
+	O(1,2,3)=-sqrt(3.0)*0.5
+	O(1,3,3)=0.0
+	O(2,1,3)=sqrt(3.0)*0.5
+	O(2,2,3)=-0.5
+	O(2,3,3)=0.0
+	O(3,1,3)=0.0
+	O(3,2,3)=0.0
+	O(3,3,3)=1.0
+!     4      
+	O(1,1,4)=0.5
+	O(1,2,4)=sqrt(3.0)*0.5
+	O(1,3,4)=0.0
+	O(2,1,4)=-sqrt(3.0)*0.5
+	O(2,2,4)=0.5
+	O(2,3,4)=0.0
+	O(3,1,4)=0.0
+	O(3,2,4)=0.0
+	O(3,3,4)=1.0
+!     5      
+	O(1,1,5)=-1.0
+	O(1,2,5)=0.0
+	O(1,3,5)=0.0
+	O(2,1,5)=0.0
+	O(2,2,5)=-1.0
+	O(2,3,5)=0.0
+	O(3,1,5)=0.0
+	O(3,2,5)=0.0
+	O(3,3,5)=1.0
+!     6      
+	O(1,1,6)=0.5
+	O(1,2,6)=-sqrt(3.0)*0.5
+	O(1,3,6)=0.0
+	O(2,1,6)=sqrt(3.0)*0.5
+	O(2,2,6)=0.5
+	O(2,3,6)=0.0
+	O(3,1,6)=0.0
+	O(3,2,6)=0.0
+	O(3,3,6)=1.0
+!     7      
+	O(1,1,7)=-0.5
+	O(1,2,7)=-sqrt(3.0)*0.5
+	O(1,3,7)=0.0
+	O(2,1,7)=-sqrt(3.0)*0.5
+	O(2,2,7)=0.5
+	O(2,3,7)=0.0
+	O(3,1,7)=0.0
+	O(3,2,7)=0.0
+	O(3,3,7)=-1.0
+!     8      
+	O(1,1,8)=1.0
+	O(1,2,8)=0.0
+	O(1,3,8)=0.0
+	O(2,1,8)=0.0
+	O(2,2,8)=-1.0
+	O(2,3,8)=0.0
+	O(3,1,8)=0.0
+	O(3,2,8)=0.0
+	O(3,3,8)=-1.0
+!     9      
+	O(1,1,9)=-0.5
+	O(1,2,9)=sqrt(3.0)*0.5
+	O(1,3,9)=0.0
+	O(2,1,9)=sqrt(3.0)*0.5
+	O(2,2,9)=0.5
+	O(2,3,9)=0.0
+	O(3,1,9)=0.0
+	O(3,2,9)=0.0
+	O(3,3,9)=-1.0
+!     10      
+	O(1,1,10)=0.5
+	O(1,2,10)=sqrt(3.0)*0.5
+	O(1,3,10)=0.0
+	O(2,1,10)=sqrt(3.0)*0.5
+	O(2,2,10)=-0.5
+	O(2,3,10)=0.0
+	O(3,1,10)=0.0
+	O(3,2,10)=0.0
+	O(3,3,10)=-1.0
+!     11      
+	O(1,1,11)=-1.0
+	O(1,2,11)=0.0
+	O(1,3,11)=0.0
+	O(2,1,11)=0.0
+	O(2,2,11)=1.0
+	O(2,3,11)=0.0
+	O(3,1,11)=0.0
+	O(3,2,11)=0.0
+	O(3,3,11)=-1.0
+!     12      
+	O(1,1,12)=0.5
+	O(1,2,12)=-sqrt(3.0)*0.5
+	O(1,3,12)=0.0
+	O(2,1,12)=-sqrt(3.0)*0.5
+	O(2,2,12)=-0.5
+	O(2,3,12)=0.0
+	O(3,1,12)=0.0
+	O(3,2,12)=0.0
+	O(3,3,12)=-1.0
+
+	elseif (ii.eq.3) then    ! cubic (m-3m)
+	ns=24
+
+!     1       h  k  l
+	O(1,1,1)=1.0
+	O(1,2,1)=0.0
+	O(1,3,1)=0.0
+	O(2,1,1)=0.0
+	O(2,2,1)=1.0
+	O(2,3,1)=0.0
+	O(3,1,1)=0.0
+	O(3,2,1)=0.0
+	O(3,3,1)=1.0
+c  2		 l  h  k
+	O(1,1,2)=0.0
+	O(1,2,2)=0.0
+	O(1,3,2)=1.0
+	O(2,1,2)=1.0
+	O(2,2,2)=0.0
+	O(2,3,2)=0.0
+	O(3,1,2)=0.0
+	O(3,2,2)=1.0
+	O(3,3,2)=0.0
+c  3          k  l  h
+	O(1,1,3)=0.0
+	O(1,2,3)=1.0
+	O(1,3,3)=0.0
+	O(2,1,3)=0.0
+	O(2,2,3)=0.0
+	O(2,3,3)=1.0
+	O(3,1,3)=1.0
+	O(3,2,3)=0.0
+	O(3,3,3)=0.0
+c  4	  -k l  -h
+	O(1,1,4)=0.0
+	O(1,2,4)=-1.0
+	O(1,3,4)=0.0
+	O(2,1,4)=0.0
+	O(2,2,4)=0.0
+	O(2,3,4)=1.0
+	O(3,1,4)=-1.0
+	O(3,2,4)=0.0
+	O(3,3,4)=0.0
+c  5       -k -l h 
+	O(1,1,5)=0.0
+	O(1,2,5)=-1.0
+	O(1,3,5)=0.0
+	O(2,1,5)=0.0
+	O(2,2,5)=0.0
+	O(2,3,5)=-1.0
+	O(3,1,5)=1.0
+	O(3,2,5)=0.0
+	O(3,3,5)=0.0
+c  6	  k  -l -h
+	O(1,1,6)=0.0
+	O(1,2,6)=1.0
+	O(1,3,6)=0.0
+	O(2,1,6)=0.0
+	O(2,2,6)=0.0
+	O(2,3,6)=-1.0
+	O(3,1,6)=-1.0
+	O(3,2,6)=0.0
+	O(3,3,6)=0.0
+c  7     -l h  -k 
+	O(1,1,7)=0.0
+	O(1,2,7)=0.0
+	O(1,3,7)=-1.0
+	O(2,1,7)=1.0
+	O(2,2,7)=0.0
+	O(2,3,7)=0.0
+	O(3,1,7)=0.0
+	O(3,2,7)=-1.0
+	O(3,3,7)=0.0
+c  8      -l -h k
+	O(1,1,8)=0.0
+	O(1,2,8)=0.0
+	O(1,3,8)=-1.0
+	O(2,1,8)=-1.0
+	O(2,2,8)=0.0
+	O(2,3,8)=0.0
+	O(3,1,8)=0.0
+	O(3,2,8)=1.0
+	O(3,3,8)=0.0
+c    9       l  -h -k
+	O(1,1,9)=0.0
+	O(1,2,9)=0.0
+	O(1,3,9)=1.0
+	O(2,1,9)=-1.0
+	O(2,2,9)=0.0
+	O(2,3,9)=0.0
+	O(3,1,9)=0.0
+	O(3,2,9)=-1.0
+	O(3,3,9)=0.0
+c 10		 -h k  -l 
+	O(1,1,10)=-1.0
+	O(1,2,10)=0.0
+	O(1,3,10)=0.0
+	O(2,1,10)=0.0
+	O(2,2,10)=1.0
+	O(2,3,10)=0.0
+	O(3,1,10)=0.0
+	O(3,2,10)=0.0
+	O(3,3,10)=-1.0
+c 11         -h -k l
+	O(1,1,11)=-1.0
+	O(1,2,11)=0.0
+	O(1,3,11)=0.0
+	O(2,1,11)=0.0
+	O(2,2,11)=-1.0
+	O(2,3,11)=0.0
+	O(3,1,11)=0.0
+	O(3,2,11)=0.0
+	O(3,3,11)=1.0
+c 12	      h  -k -l 
+	O(1,1,12)=1.0
+	O(1,2,12)=0.0
+	O(1,3,12)=0.0
+	O(2,1,12)=0.0
+	O(2,2,12)=-1.0
+	O(2,3,12)=0.0
+	O(3,1,12)=0.0
+	O(3,2,12)=0.0
+	O(3,3,12)=-1.0
+c 13           -l -k -h 
+	O(1,1,13)=0.0
+	O(1,2,13)=0.0
+	O(1,3,13)=-1.0
+	O(2,1,13)=0.0
+	O(2,2,13)=-1.0
+	O(2,3,13)=0.0
+	O(3,1,13)=-1.0
+	O(3,2,13)=0.0
+	O(3,3,13)=0.0
+c 14	       l  -k h  
+	O(1,1,14)=0.0
+	O(1,2,14)=0.0
+	O(1,3,14)=1.0
+	O(2,1,14)=0.0
+	O(2,2,14)=-1.0
+	O(2,3,14)=0.0
+	O(3,1,14)=1.0
+	O(3,2,14)=0.0
+	O(3,3,14)=0.0
+c 15           l  k  -h 
+	O(1,1,15)=0.0
+	O(1,2,15)=0.0
+	O(1,3,15)=1.0
+	O(2,1,15)=0.0
+	O(2,2,15)=1.0
+	O(2,3,15)=0.0
+	O(3,1,15)=-1.0
+	O(3,2,15)=0.0
+	O(3,3,15)=0.0
+c 16           -l k  h 
+	O(1,1,16)=0.0
+	O(1,2,16)=0.0
+	O(1,3,16)=-1.0
+	O(2,1,16)=0.0
+	O(2,2,16)=1.0
+	O(2,3,16)=0.0
+	O(3,1,16)=1.0
+	O(3,2,16)=0.0
+	O(3,3,16)=0.0 
+
+c 17            -h -l -k 
+	O(1,1,17)=-1.0
+	O(1,2,17)=0.0
+	O(1,3,17)=0.0
+	O(2,1,17)=0.0
+	O(2,2,17)=0.0
+	O(2,3,17)=-1.0
+	O(3,1,17)=0.0
+	O(3,2,17)=-1.0
+	O(3,3,17)=0.0
+c 18		    h  -l k  
+	O(1,1,18)=1.0
+	O(1,2,18)=0.0
+	O(1,3,18)=0.0
+	O(2,1,18)=0.0
+	O(2,2,18)=0.0
+	O(2,3,18)=-1.0
+	O(3,1,18)=0.0
+	O(3,2,18)=1.0
+	O(3,3,18)=0.0
+c 19          h  l  -k
+	O(1,1,19)=1.0
+	O(1,2,19)=0.0
+	O(1,3,19)=0.0
+	O(2,1,19)=0.0
+	O(2,2,19)=0.0
+	O(2,3,19)=1.0
+	O(3,1,19)=0.0
+	O(3,2,19)=-1.0
+	O(3,3,19)=0.0
+c 20	       -h l  k
+	O(1,1,20)=-1.0
+	O(1,2,20)=0.0
+	O(1,3,20)=0.0
+	O(2,1,20)=0.0
+	O(2,2,20)=0.0
+	O(2,3,20)=1.0
+	O(3,1,20)=0.0
+	O(3,2,20)=1.0
+	O(3,3,20)=0.0
+c 21          -k -h -l 
+	O(1,1,21)=0.0
+	O(1,2,21)=-1.0
+	O(1,3,21)=0.0
+	O(2,1,21)=-1.0
+	O(2,2,21)=0.0
+	O(2,3,21)=0.0
+	O(3,1,21)=0.0
+	O(3,2,21)=0.0
+	O(3,3,21)=-1.0
+c 22	      k  -h l
+	O(1,1,22)=0.0
+	O(1,2,22)=1.0
+	O(1,3,22)=0.0
+	O(2,1,22)=-1.0
+	O(2,2,22)=0.0
+	O(2,3,22)=0.0
+	O(3,1,22)=0.0
+	O(3,2,22)=0.0
+	O(3,3,22)=1.0      ! changed to +1 
+c 23          k  h  -l
+	O(1,1,23)=0.0
+	O(1,2,23)=1.0
+	O(1,3,23)=0.0
+	O(2,1,23)=1.0
+	O(2,2,23)=0.0
+	O(2,3,23)=0.0
+	O(3,1,23)=0.0
+	O(3,2,23)=0.0
+	O(3,3,23)=-1.0
+c 24           -k h  l
+	O(1,1,24)=0.0
+	O(1,2,24)=-1.0
+	O(1,3,24)=0.0
+	O(2,1,24)=1.0
+	O(2,2,24)=0.0
+	O(2,3,24)=0.0
+	O(3,1,24)=0.0
+	O(3,2,24)=0.0
+	O(3,3,24)=1.0     ! changed to +1
+
+	elseif (ii.eq.4) then    ! trigonal (3/m)
+      ns=3
+!     1      
+	O(1,1,1)=1.0
+	O(1,2,1)=0.0
+	O(1,3,1)=0.0
+	O(2,1,1)=0.0
+	O(2,2,1)=1.0
+	O(2,3,1)=0.0
+	O(3,1,1)=0.0
+	O(3,2,1)=0.0
+	O(3,3,1)=1.0
+!     2      
+	O(1,1,2)=cos(2.0/3.0*pi)
+	O(1,2,2)=-sin(2.0/3.0*pi)
+	O(1,3,2)=0.0
+	O(2,1,2)=sin(2.0/3.0*pi)
+	O(2,2,2)=cos(2.0/3.0*pi)
+	O(2,3,2)=0.0
+	O(3,1,2)=0.0
+	O(3,2,2)=0.0
+	O(3,3,2)=1.0
+!     3      
+	O(1,1,3)=cos(4.0/3.0*pi)
+	O(1,2,3)=-sin(4.0/3.0*pi)
+	O(1,3,3)=0.0
+	O(2,1,3)=sin(4.0/3.0*pi)
+	O(2,2,3)=cos(4.0/3.0*pi)
+	O(2,3,3)=0.0
+	O(3,1,3)=0.0
+	O(3,2,3)=0.0
+	O(3,3,3)=1.0
+!     4      
+	O(1,1,4)=1.0
+	O(1,2,4)=0.0
+	O(1,3,4)=0.0
+	O(2,1,4)=0.0
+	O(2,2,4)=1.0
+	O(2,3,4)=0.0
+	O(3,1,4)=0.0
+	O(3,2,4)=0.0
+	O(3,3,4)=-1.0
+!     5      
+	O(1,1,5)=cos(2.0/3.0*pi)
+	O(1,2,5)=-sin(2.0/3.0*pi)
+	O(1,3,5)=0.0
+	O(2,1,5)=sin(2.0/3.0*pi)
+	O(2,2,5)=cos(2.0/3.0*pi)
+	O(2,3,5)=0.0
+	O(3,1,5)=0.0
+	O(3,2,5)=0.0
+	O(3,3,5)=-1.0
+!     6      
+	O(1,1,6)=cos(2.0/3.0*pi)
+	O(1,2,6)=-sin(2.0/3.0*pi)
+	O(1,3,6)=0.0
+	O(2,1,6)=sin(2.0/3.0*pi)
+	O(2,2,6)=cos(2.0/3.0*pi)
+	O(2,3,6)=0.0
+	O(3,1,6)=0.0
+	O(3,2,6)=0.0
+	O(3,3,6)=-1.0
+
+
+	elseif (ii.eq.5) then    ! orthorhombic (222)
+	ns = 4
+
+!     1       h  k  l
+	O(1,1,1)=1.0
+	O(1,2,1)=0.0
+	O(1,3,1)=0.0
+	O(2,1,1)=0.0
+	O(2,2,1)=1.0
+	O(2,3,1)=0.0
+	O(3,1,1)=0.0
+	O(3,2,1)=0.0
+	O(3,3,1)=1.0
+c 2		 -h k  -l   180 on Y
+	O(1,1,2)=-1.0
+	O(1,2,2)=0.0
+	O(1,3,2)=0.0
+	O(2,1,2)=0.0
+	O(2,2,2)=1.0
+	O(2,3,2)=0.0
+	O(3,1,2)=0.0
+	O(3,2,2)=0.0
+	O(3,3,2)=-1.0
+c 3         -h -k l    180 on Z
+	O(1,1,3)=-1.0
+	O(1,2,3)=0.0
+	O(1,3,3)=0.0
+	O(2,1,3)=0.0
+	O(2,2,3)=-1.0
+	O(2,3,3)=0.0
+	O(3,1,3)=0.0
+	O(3,2,3)=0.0
+	O(3,3,3)=1.0
+c 4	      h  -k -l   180 on X
+	O(1,1,4)=1.0
+	O(1,2,4)=0.0
+	O(1,3,4)=0.0
+	O(2,1,4)=0.0
+	O(2,2,4)=-1.0
+	O(2,3,4)=0.0
+	O(3,1,4)=0.0
+	O(3,2,4)=0.0
+	O(3,3,4)=-1.0
+
+      
+
+	endif
+
+
+	return
+	end  
+  \end{lstlisting}
+
+\subsection{common.fi}
+
+  \begin{lstlisting}
+  
+         real pi
+	   real O(3,3,24)	   
+	   real O1(3,3,24)	  
+       real O2(3,3,24)
+	   real AA(200,7)
+	   real e1(3), e2(3)   
+	   real g1(3,3)
+	   real g2(3,3)
+	   real nref1(3),nref2(3),nref3(3)
+	   real nf1(3),nf2(3),nf3(3), ax(3)
+	   real disor, angle, min_angle, rot, min_rot
+	   real misor
+	   real mis1,dis1,mis2,dis2,mis3,dis3
+	   real so1(3,3), so2(3,3)
+	   real gg1(3,3), gg2(3,3)   
+	   real gg1t(3,3), gg2t(3,3)	   
+	   real gt(3,3)
+       real dg(3,3)
+	   real euler(3), angs(2)
+	   real g(3,3)	   
+	   real xz, xp, yp
+	   real delg(3,3)	   
+	   real acos2	   
+	   real g3(3,3)
+	   real n1(3), n2(3), n3(3),n4(4)
+       real vector_out(3), theta, psi, phi, v(3), a(2)
+	   real x(3)
+	   real op(3,3,24)
+	   real so(3,3)
+	   real temp, value, denom
+	   real gamma(62)
+	   real tri(12,3)
+	   real dihed(3)
+	   real delta
+	   real xi1, xf1, yi1, yf1
+	   real xi2, xf2, yi2, yf2
+	   real xi3, xf3, yi3, yf3
+       real value1, value2
+	   integer nnline, id1, id2
+	   integer seed, sym1, sym2
+	   integer nsymm, nsymm1, nsymm2, rotation, radian, msym
+	   integer i
+	   integer j
+	   integer k
+	   integer ii
+	   integer jj
+	   integer kk
+	   integer ns
+	   integer nit, rs_limit
+	   integer i_tjs
+	   integer counter, point
+	   character*11 tempword
+	   character*16 version	   
+	   character*7 phase
+	   character*7 phase_in	   
+	   character*100 keyword
+	   common/ const1/ pi
+
+       common/ nsymmetry/ nsymm
+        
+  \end{lstlisting}

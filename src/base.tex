@@ -1,102 +1,92 @@
-\documentclass[12pt,%
-               %draft,%
-%               oneside,
-               twoside,
-               letterpaper]{uiothesis}
+\documentclass[	12pt,%
+%				draft,%
+%				oneside,%
+				twoside,%
+				letterpaper]{uiothesis}
 
 \author{Andrew M. Schultz}
-%\usepackage{flafter}
-\usepackage{adforn}
 \graphicspath{{../graphics/}}	
 
-%\includeonly{polycrystalline.growth}
-
-    \renewcommand{\topfraction}{0.9}	% max fraction of floats at top
-    \renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
-    %   Parameters for TEXT pages (not float pages):
-    \setcounter{topnumber}{2}
-    \setcounter{bottomnumber}{2}
-    \setcounter{totalnumber}{4} 
-    
-\usepackage{lipsum}
-%\DisemulatePackage{setspace}
-%\usepackage{setspace}					
-%\setstretch{1.2}
 
 
-\usepackage[defaultmono]{droidmono}
+
 \begin{document}
 
-  \input glyphtounicode
-  \pdfgentounicode=1
-  \chapterstyle{uio}
-  \pagestyle{uio}
-  \maxsecnumdepth{subsection}
+\input glyphtounicode
+\pdfgentounicode=1
+
+\chapterstyle{uio}
+\pagestyle{uio}
+\maxsecnumdepth{subsection}
 
 
-  \frontmatter
-    \pagenumbering{alph}
-    \maketitle
-    \pagenumbering{roman}
-    
-    \cleardoublepage
-	\OnehalfSpacing
-    
-    \include{acknowledgements}
-    \include{abstract}
-    
-    \SingleSpacing
-    
-    \cleardoublepage
-    \tableofcontents
-    
-    \cleardoublepage
-    \listoffigures
-    
-    \cleardoublepage
-    \listoftables
-    %\clearpage
-    %\listofsourcecode
-    \OnehalfSpacing
+\frontmatter
+
+	\pagenumbering{alph}
+	
+	\maketitle
+	\cleardoublepage
+
+	\pagenumbering{roman}
+	
+	\include{acknowledgements}
+	\cleardoublepage
+	
+	\include{abstract}
+	\cleardoublepage
+	
+	\tableofcontents
+	\cleardoublepage
+	
+	\listoffigures
+	\cleardoublepage
+
+	\listoftables
+	\cleardoublepage
+
 	\include{publications}
-    
+	\cleardoublepage
 
-  \mainmatter
-	\DoubleSpacing 
-	\part{Introduction \oldand Background} %  Maybe delete just this Part label?
+
+\mainmatter
+
+	\part{Introduction \oldand Background}
 		\include{introduction}
 		\include{background}
 		\include{experimental}
-	
+
 	\part{Experiments on Photochemical Activity}
 		\include{fe2o3.orientation}
-	   	\include{single.crystal.reactivity}
+		\include{single.crystal.reactivity}
 		\include{polycrystalline.reactivity}
-	
+
 	\part{Experiments on Film Growth}
-   		\include{single.crystal.growth}
+		\include{single.crystal.growth}
 		\include{polycrystalline.growth}
-	
+
 	\part{Experiments on Bismuth Ferrite}	
 		\include{bifeo3}	
-		
-		
+
 	\part{Summary, Conclusions, \oldand Future Paths}
 		\include{conclusion} 
-\SingleSpacing
 
-	\referenceschapter
 
-% \addcontentsline{toc}{part}{\appendixtocname}
-%    \appendixpage*
-%
-%    \begin{appendices}
-%      \include{orientation.calculations}
-%      \include{source.code}
-%      \include{fe2o3.orientation.images}
-%      
-%    \end{appendices}
-%
-\cleardoublepage
-\makecolophon
+\phantomsection
+
+	\bibliographystyle{cmuthesis.bst}
+	\renewcommand{\bibname}{References}
+	\bibliography{thesis-cited}
+	
+
+\addcontentsline{toc}{part}{\appendixtocname}
+
+	\appendixpage*
+
+	\begin{appendices}
+		\include{polycrystalline.reactivity.old}
+	\end{appendices}
+	\cleardoublepage
+	
+	\makecolophon
+
 \end{document}

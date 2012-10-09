@@ -1,0 +1,92 @@
+This is BibTeX, Version 0.99d (TeX Live 2011)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: base.aux
+A level-1 auxiliary file: acknowledgements.aux
+A level-1 auxiliary file: abstract.aux
+A level-1 auxiliary file: publications.aux
+A level-1 auxiliary file: introduction.aux
+A level-1 auxiliary file: background.aux
+A level-1 auxiliary file: experimental.aux
+A level-1 auxiliary file: fe2o3.orientation.aux
+A level-1 auxiliary file: single.crystal.reactivity.aux
+A level-1 auxiliary file: polycrystalline.reactivity.aux
+A level-1 auxiliary file: single.crystal.growth.aux
+A level-1 auxiliary file: polycrystalline.growth.aux
+A level-1 auxiliary file: bifeo3.aux
+A level-1 auxiliary file: conclusion.aux
+The style file: cmuthesis.bst.bst
+A level-1 auxiliary file: polycrystalline.reactivity.old.aux
+Database file #1: thesis-cited.bib
+Warning--missing institution in Report:2004wb
+You can't pop an empty literal stack for entry Morrison:1980va
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry memming2001semiconductor
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--empty author and editor in noauthororeditor2007handbook
+You can't pop an empty literal stack for entry noauthororeditor2007handbook
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Kaneko:2002vh
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--missing publisher in Lines:1977ug
+You can't pop an empty literal stack for entry Lines:1977ug
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Herman:2004to
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Chrisey:1994ta
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Kosmulski:2001ww
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry Schwartz:2009ue
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry birkholz2006thin
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--can't use both author and editor fields in Domen:1996um
+You can't pop an empty literal stack for entry Domen:1996um
+while executing---line 1353 of file cmuthesis.bst.bst
+Warning--empty pages in Domen:1996um
+You can't pop an empty literal stack for entry bringhurst2004elements
+while executing---line 1353 of file cmuthesis.bst.bst
+You can't pop an empty literal stack for entry tufte1983visual
+while executing---line 1353 of file cmuthesis.bst.bst
+You've used 121 entries,
+            2581 wiz_defined-function locations,
+            1360 strings with 26831 characters,
+and the built_in function-call counts, 55840 in all, are:
+= -- 4527
+> -- 1392
+< -- 214
++ -- 514
+- -- 393
+* -- 3569
+:= -- 5706
+add.period$ -- 243
+call.type$ -- 121
+change.case$ -- 8
+chr.to.int$ -- 12
+cite$ -- 126
+duplicate$ -- 5145
+empty$ -- 4921
+format.name$ -- 481
+if$ -- 12829
+int.to.chr$ -- 0
+int.to.str$ -- 121
+missing$ -- 1120
+newline$ -- 487
+num.names$ -- 120
+pop$ -- 1332
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 2238
+stack$ -- 0
+substring$ -- 4151
+swap$ -- 4220
+text.length$ -- 210
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 5
+while$ -- 425
+width$ -- 124
+write$ -- 1085
+(There were 13 error messages)
